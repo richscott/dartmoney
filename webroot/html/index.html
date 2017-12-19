@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>My Portfolio</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="css/bootstrap-4/bootstrap.min.css" 
+      integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+  </head>
+  <body style="padding: 0.5em">
+    <div class="container">
+      <h2 class="text-primary">Log In or Sign Up</h2>
+      <div class="row">
+        <div class="col-6">
+          <form>
+            <div class="form-group">
+              <label for="loginEmail">Email address</label>
+              <input type="email" class="form-control" id="loginEmail"
+                aria-describedby="emailHelp" placeholder="name@example.com">
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Password</label>
+              <input type="password" class="form-control" id="loginPassword" placeholder="Password">
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <p/>
+
+    <h3 class="text-primary" style="margin-top: 2.5em">Portfolio Details</h2>
+    <div class="container" id="portfolioList">
+      <div class="row">
+        <h5 class="col-2">Stock Symbol</h5>
+        <h5 class="col-4">Company Name</h5>
+        <h5 class="col-2" style="text-align:right">Price</h5>
+        <h5 class="col-2" style="text-align:right">Shares</h5>
+        <h5 class="col-2" style="text-align:right">Value</h5>
+      </div>
+    </div>
+
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap-4/bootstrap.min.js"></script>
+    <script src="js/underscore-min.js"></script>
+    <script src="js/accounting.js"></script>
+    <script>
+      $('body').ready(function() {
+        $.ajax({
+          url: '/api/portfolio/666',
+          dataType: 'json',
+          success: function(data, textStatus, jqXHR) {
+            // console.log(`portfolio data =\n${JSON.stringify(data, null, '  ')}`)
+            const sortedSyms = _.keys(data).sort()
+    
+            _.each(sortedSyms, (symbol) => {
+              const equity = data[symbol]
+              const newRow = `
+                <div class="row" id="equity-${symbol}">
+                  <div class="col-2 symbol">${symbol.toUpperCase()}</div>
+                  <div class="col-4 name">${equity.name}</div>
+                  <div class="col-2 price" style="text-align:right">&#151;</div>
+                  <div class="col-2 shares" style="text-align:right">${equity.shares}</div>
+                  <div class="col-2 value" style="text-align:right">&#151;</div>
+                </div>
+              `
+              $('#portfolioList').append(newRow)
+            })
+
+            _.each(sortedSyms, (symbol) => {
+              $.ajax({
+                url: `/api/quote/${symbol}`,
+                dataType: 'json',
+                success: function(data, textStatus, jqXHR) {
+                  const closingPrice = parseFloat(data["Time Series (Daily)"]["2017-12-15"]["4. close"])
+                  $(`#equity-${symbol} > div.price`)
+                    .empty()
+                    .append(accounting.formatMoney(closingPrice))
+
+                  const numShares = parseInt($(`#equity-${symbol} > div.shares`).text(), 10)
+                  $(`#equity-${symbol} > div.value`)
+                    .empty()
+                    .append(accounting.formatMoney(closingPrice * numShares))
+                }
+              })
+            })
+          }
+        })
+
+      })
+    </script>
+  </body>
+</html>
