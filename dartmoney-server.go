@@ -75,9 +75,9 @@ func userPositions(c *gin.Context) {
 	//userId := c.Param("userId")
 
 	userPositions := make(map[string]securityPosition)
-	userPositions["aapl"] = securityPosition{Name: "Apple", Symbol: "aapl", Shares: 250}
-	userPositions["baba"] = securityPosition{Name: "Alibaba Group", Symbol: "baba", Shares: 300}
-	userPositions["brk.a"] = securityPosition{Name: "Berkshire Hathaway", Symbol: "brk.a", Shares: 40}
+	userPositions["aapl"] = securityPosition{Name: "Apple", Symbol: "aapl", Shares: 255}
+	userPositions["baba"] = securityPosition{Name: "Alibaba Group", Symbol: "baba", Shares: 125}
+	userPositions["brk.a"] = securityPosition{Name: "Berkshire Hathaway", Symbol: "brk.a", Shares: 18}
 	userPositions["sbny"] = securityPosition{Name: "Signature Bank of New York", Symbol: "sbny", Shares: 160}
 
 	c.JSON(http.StatusOK, userPositions)
