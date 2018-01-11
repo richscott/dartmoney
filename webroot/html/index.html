@@ -41,55 +41,6 @@
       </div>
     </div>
 
-    <script src="js/jquery-3.2.1.min.js"></script>
-    <script src="js/popper.min.js"></script>
-    <script src="js/bootstrap-4/bootstrap.min.js"></script>
-    <script src="js/underscore-min.js"></script>
-    <script src="js/accounting.js"></script>
-    <script>
-      $('body').ready(function() {
-        $.ajax({
-          url: '/api/portfolio/666',
-          dataType: 'json',
-          success: function(data, textStatus, jqXHR) {
-            // console.log(`portfolio data =\n${JSON.stringify(data, null, '  ')}`)
-            const sortedSyms = _.keys(data).sort()
-    
-            _.each(sortedSyms, (symbol) => {
-              const equity = data[symbol]
-              const newRow = `
-                <div class="row" id="equity-${symbol}">
-                  <div class="col-2 symbol">${symbol.toUpperCase()}</div>
-                  <div class="col-4 name">${equity.name}</div>
-                  <div class="col-2 price" style="text-align:right">&#151;</div>
-                  <div class="col-2 shares" style="text-align:right">${equity.shares}</div>
-                  <div class="col-2 value" style="text-align:right">&#151;</div>
-                </div>
-              `
-              $('#portfolioList').append(newRow)
-            })
-
-            _.each(sortedSyms, (symbol) => {
-              $.ajax({
-                url: `/api/quote/${symbol}`,
-                dataType: 'json',
-                success: function(data, textStatus, jqXHR) {
-                  const closingPrice = parseFloat(data["Time Series (Daily)"]["2017-12-15"]["4. close"])
-                  $(`#equity-${symbol} > div.price`)
-                    .empty()
-                    .append(accounting.formatMoney(closingPrice))
-
-                  const numShares = parseInt($(`#equity-${symbol} > div.shares`).text(), 10)
-                  $(`#equity-${symbol} > div.value`)
-                    .empty()
-                    .append(accounting.formatMoney(closingPrice * numShares))
-                }
-              })
-            })
-          }
-        })
-
-      })
-    </script>
+    <script src="/js/dist/index.js"></script>
   </body>
 </html>
