@@ -11,21 +11,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"dartmoney/db"
+	"github.com/richscott/dartmoney/db"
 )
-
-type securityPosition struct {
-	Name   string `json:"name"`
-	Symbol string `json:"symbol"`
-	Shares int    `json:"shares"`
-}
 
 func main() {
 	if os.Getenv("ALPHAVANTAGE_API_KEY") == "" {
 		log.Fatal("Error: environment variable ALPHAVANTAGE_API_KEY is not set")
 	}
-
-	log.Printf("Using Gin framework version %s\n", gin.Version)
 
 	db.CreateSchema()
 
@@ -56,6 +48,7 @@ func symbolsQuote(c *gin.Context) {
 
 	httpClient := http.Client{Timeout: fetchTimeout}
 	resp, err := httpClient.Get(quoteURL)
+
 	if err != nil {
 		log.Print(err)
 		return
@@ -71,14 +64,13 @@ func symbolsQuote(c *gin.Context) {
 	c.Data(http.StatusOK, "application/json", body)
 }
 
+func buyEquity(c *gin.Context) {
+
+}
+
 func userPositions(c *gin.Context) {
 	//userId := c.Param("userId")
-
-	userPositions := make(map[string]securityPosition)
-	userPositions["aapl"] = securityPosition{Name: "Apple", Symbol: "aapl", Shares: 255}
-	userPositions["baba"] = securityPosition{Name: "Alibaba Group", Symbol: "baba", Shares: 125}
-	userPositions["brk.a"] = securityPosition{Name: "Berkshire Hathaway", Symbol: "brk.a", Shares: 18}
-	userPositions["sbny"] = securityPosition{Name: "Signature Bank of New York", Symbol: "sbny", Shares: 160}
+	userPositions := db.UserPositions("investor@somewhere")
 
 	c.JSON(http.StatusOK, userPositions)
 }

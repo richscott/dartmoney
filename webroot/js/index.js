@@ -19,12 +19,12 @@ const updateQuotes = sortedSyms =>
         const symbol = quote['1. symbol'].toLowerCase()
         const price = quote['2. price']
         const $symbolRow = $(`#equity-${symbol.replace('.', '\\.')}`)
-        $symbolRow.find(`div.price`)
+        $symbolRow.find('div.price')
           .empty()
           .append(accounting.formatMoney(price))
 
-        const numShares = parseInt($symbolRow.find(`div.shares`).text(), 10)
-        $symbolRow.find(`div.value`)
+        const numShares = parseInt($symbolRow.find('div.shares').text(), 10)
+        $symbolRow.find('div.value')
           .empty()
           .append(accounting.formatMoney(price * numShares))
       })
@@ -36,10 +36,10 @@ const buildPortfolioTable = () =>
     url: '/api/portfolio/666',
     dataType: 'json',
     success: (data /* , textStatus, jqXHR */) => {
-      const sortedSyms = _.keys(data).sort()
+      const sortedSyms = data.map(d => d.symbol).sort()
 
       _.each(sortedSyms, (symbol) => {
-        const equity = data[symbol]
+        const equity = data.find(d => d.symbol == symbol)
         const newRow = `
           <div class="row" id="equity-${symbol}">
             <div class="col-2 symbol">${symbol.toUpperCase()}</div>
@@ -54,6 +54,23 @@ const buildPortfolioTable = () =>
       updateQuotes(sortedSyms)
     }
   })
+
+const buyEquity = () => {
+  const numShares = parseInt($('#buyShares').val(), 10) || 0
+
+  $.ajax({
+    url: '/api/portfolio/666',
+    method: 'POST',
+    dataType: 'json',
+    data: {
+      symbol: $('#buySymbol').val(),
+      numShares
+    },
+    success: (data /* , textStatus, jqXHR */) => {
+      console.log(`Successfully bought equity; data = ${JSON.stringify(data)}`)
+    }
+  })
+}
 
 $('body').ready(() => {
   buildPortfolioTable()

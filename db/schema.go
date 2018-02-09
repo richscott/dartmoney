@@ -31,7 +31,7 @@ func CreateSchema() {
 	// use sqlx.Open() for sql.Open() semantics
 	db, err := sqlx.Connect("postgres", "user=finance dbname=portfolio sslmode=disable")
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln(err, "\nCould not connect to database - is Postgresql running?")
 	}
 
 	// exec the schema or fail; multi-statement Exec behavior varies between
@@ -40,15 +40,15 @@ func CreateSchema() {
 
 	tx := db.MustBegin()
 	tx.MustExec("INSERT INTO account (email, hash_pass, name) VALUES ($1, $2, $3)",
-		"richscott@sent.com", "xxx", "Rich Scott")
+		"investor@somewhere", "xxx", "Hopeful Investor")
 	tx.Commit()
 
 	tx = db.MustBegin()
 	sharesInsert := `INSERT INTO account_positions (symbol, name, shares, account_id)
                    VALUES ($1, $2, $3, (select id from account where email = $4))`
-	tx.MustExec(sharesInsert, "sbny", "Signature Bank of NY", 35, "richscott@sent.com")
-	tx.MustExec(sharesInsert, "aapl", "Apple", 250, "richscott@sent.com")
-	tx.MustExec(sharesInsert, "brk.a", "Berkshire Hathaway", 12, "richscott@sent.com")
-	tx.MustExec(sharesInsert, "baba", "Ali Baba Group", 75, "richscott@sent.com")
+	tx.MustExec(sharesInsert, "sbny", "Signature Bank of NY", 35, "investor@somewhere")
+	tx.MustExec(sharesInsert, "aapl", "Apple", 250, "investor@somewhere")
+	tx.MustExec(sharesInsert, "brk.a", "Berkshire Hathaway", 12, "investor@somewhere")
+	tx.MustExec(sharesInsert, "baba", "Ali Baba Group", 75, "investor@somewhere")
 	tx.Commit()
 }
